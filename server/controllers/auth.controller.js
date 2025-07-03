@@ -1,12 +1,14 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { JWT_EXPIRES_IN, JWT_SECRET } from "../config/env.js";
-
 import { db } from "../database/db.js";
 import validateEmail from "../utils/validateEmail.js";
 
 export const signUp = async (req, res, next) => {
+  const connection = await db.getConnection();
   try {
+    await connection.beginTransaction();
+
     const { name, email, password } = req.body;
 
     // Required fields
@@ -23,7 +25,7 @@ export const signUp = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Check if user already exists
-    const [existingUser] = await db.query(
+    const [existingUser] = await connection.query(
       "SELECT * FROM users WHERE email = ?",
       [email]
     );
@@ -31,7 +33,7 @@ export const signUp = async (req, res, next) => {
       return res.status(400).json({ message: "User already exists" });
 
     // Insert user
-    const [results] = await db.query(
+    const [results] = await connection.query(
       "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
       [name, email, hashedPassword]
     );
@@ -40,22 +42,24 @@ export const signUp = async (req, res, next) => {
     const userId = results.insertId;
 
     // Get student role ID
-    const [roleResult] = await db.query(
+    const [roleResult] = await connection.query(
       "SELECT role_id FROM roles WHERE role_name = ?",
       ["student"]
     );
     const roleId = roleResult[0].role_id;
 
     // Assign student role to user
-    await db.query("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)", [
-      userId,
-      roleId,
-    ]);
+    const [defaultRole] = await connection.query(
+      "INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)",
+      [userId, roleId]
+    );
+    if (defaultRole.affectedRows !== 1)
+      throw new Error("Failed to insert user role");
 
     const token = jwt.sign({ id: results.insertId }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
-
+    await connection.commit();
     return res.status(201).json({
       sucess: true,
       message: "User registered successfully",
@@ -65,7 +69,10 @@ export const signUp = async (req, res, next) => {
       },
     });
   } catch (error) {
+    await connection.rollback();
     next(error);
+  } finally {
+    connection.release();
   }
 };
 

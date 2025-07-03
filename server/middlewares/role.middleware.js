@@ -2,7 +2,7 @@ import { db } from "../database/db.js";
 const role = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const userId = req.user.id;
+      const userId = req.user.user_id;
 
       const [userRoles] = await db.query(
         `SELECT r.role_name from roles r JOIN user_roles ur
