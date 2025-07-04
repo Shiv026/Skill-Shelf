@@ -257,3 +257,63 @@ export const deleteCourse = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getCourseEnrollments = async (req, res, next) => {
+  try {
+    const courseId = req.params.id;
+    const userId = req.user.user_id;
+
+    // Check if the course exists or not
+    const [results] = await db.query(
+      'SELECT title FROM courses WHERE course_id = ?', 
+      [courseId]
+    );
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Course Not Found' });
+    }
+
+    /* Validate the user:
+       1. User should be admin
+       2. Or user should be the creator of the course
+    */
+    const [courseCreatorRows] = await db.query(
+      'SELECT created_by FROM courses WHERE course_id = ?', 
+      [courseId]
+    );
+
+    const isCreator = courseCreatorRows[0].created_by === userId;
+
+    // Check the roles assigned to the user
+    const [roleRows] = await db.query(
+      'SELECT r.role_name FROM roles r JOIN user_roles ur ON ur.role_id = r.role_id WHERE ur.user_id = ?', 
+      [userId]
+    );
+
+    const userRoles = roleRows.map(role => role.role_name);
+    const isAdmin = userRoles.includes('admin');
+
+    if (!isAdmin && !isCreator) {
+      return res.status(403).json({ message: 'Unauthorized Access' });
+    }
+    // Get enrolled students
+    const [enrollments] = await db.query(
+      'SELECT u.user_id, u.name, u.email FROM enrollments e JOIN users u ON e.user_id = u.user_id WHERE e.course_id = ?', 
+      [courseId]
+    );
+
+    const formattedEnrollments = enrollments.map(student => ({
+      userId: student.user_id,
+      name: student.name,
+      email: student.email
+    }));
+
+    return res.status(200).json({ 
+      message: 'Fetched Enrollments Successfully', 
+      data: formattedEnrollments 
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
