@@ -5,8 +5,8 @@ export const createCourse = async (req, res, next) => {
     const { title, description, category_id, price } = req.body;
     const created_by = req.user.user_id;
 
-    if (!title || !description || !category_id)
-      return res.status(400).json({ message: "All fields are required" });
+    if (!title || !description || !category_id || !req.file)
+      return res.status(400).json({ message: "All fields are required including thumbnail" });
 
     //check if the course is already created by the creator
     const [prevCourse] = await db.query(
@@ -25,12 +25,16 @@ export const createCourse = async (req, res, next) => {
     if (rows.length === 0)
       return res.status(409).json({ message: "Category not found" });
 
+    //thumbnail URL 
+    const thumbnailUrl = `/uploads/${req.file.filename}`;
+
+
     //handle default course price
     const coursePrice = price ?? 0.0;
 
     const [insertResult] = await db.query(
-      "INSERT INTO courses (title, description, price, category_id, created_by) VALUES (?, ?, ?, ?, ?)",
-      [title, description, coursePrice, category_id, created_by]
+      "INSERT INTO courses (title, description, thumbnail, price, category_id, created_by) VALUES (?, ?, ?, ?, ?, ?)",
+      [title, description, thumbnailUrl, coursePrice, category_id, created_by]
     );
 
     //for API check only

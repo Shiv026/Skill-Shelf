@@ -1,6 +1,8 @@
 import { Router } from "express";
 import authorize from "../middlewares/auth.middleware.js";
 import role from "../middlewares/role.middleware.js";
+import upload from "../middlewares/courseThumbnail.middleware.js";
+
 import {
   createCourse,
   viewAllCourse,
@@ -19,7 +21,7 @@ courseRouter.get("/", viewAllCourse);
 courseRouter.get("/:id", viewCourse);
 
 //Create a course (instructor, admin)
-courseRouter.post("/", authorize, role(["admin", "instructor"]), createCourse);
+courseRouter.post("/", authorize, role(["admin", "instructor"]), upload.single('thumbnail'), createCourse);
 
 //Edit the course (course instructor, admin)
 courseRouter.put("/:id", authorize, role(["admin", "instructor"]), editCourse);
