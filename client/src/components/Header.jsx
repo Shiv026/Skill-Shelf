@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { GiBookshelf } from 'react-icons/gi';
-
+import AuthContext from '../context/AuthContext';
+import { useContext } from 'react';
 const Header = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, logout } = useContext(AuthContext);
   const navigate = useNavigate();
-
+  const authButtonStyle = "px-5 py-2 rounded bg-primary text-white font-semibold hover:bg-accent transition"
   return (
     <>
       {/* Navbar */}
@@ -26,10 +28,9 @@ const Header = () => {
             to="/"
             end
             className={({ isActive }) =>
-              `transition-colors ${
-                isActive
-                  ? 'font-semibold text-primary'
-                  : 'text-muted hover:text-accent hover:scale-105'
+              `transition-colors ${isActive
+                ? 'font-semibold text-primary'
+                : 'text-muted hover:text-accent hover:scale-105'
               }`
             }
           >
@@ -38,10 +39,9 @@ const Header = () => {
           <NavLink
             to="/courses"
             className={({ isActive }) =>
-              `transition-colors ${
-                isActive
-                  ? 'font-semibold text-primary'
-                  : 'text-muted hover:text-accent hover:scale-105'
+              `transition-colors ${isActive
+                ? 'font-semibold text-primary'
+                : 'text-muted hover:text-accent hover:scale-105'
               }`
             }
           >
@@ -50,10 +50,9 @@ const Header = () => {
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
-              `transition-colors ${
-                isActive
-                  ? 'font-semibold text-primary'
-                  : 'text-muted hover:text-accent hover:scale-105'
+              `transition-colors ${isActive
+                ? 'font-semibold text-primary'
+                : 'text-muted hover:text-accent hover:scale-105'
               }`
             }
           >
@@ -63,12 +62,10 @@ const Header = () => {
 
         {/* Sign In Button */}
         <div className="hidden md:flex items-center">
-          <button
-            onClick={() => navigate('/signin')}
-            className="px-5 py-2 rounded bg-primary text-white font-semibold hover:bg-accent transition"
-          >
-            Sign In
-          </button>
+          {user
+            ? <button className={authButtonStyle} onClick={logout}>Sign Out</button>
+            : <button className={authButtonStyle} onClick={() => navigate('/signin')}>Sign In</button>
+          }
         </div>
 
         {/* Mobile Menu Button */}
@@ -90,9 +87,8 @@ const Header = () => {
 
       {/* Sidebar */}
       <div
-        className={`md:hidden fixed top-0 left-0 z-60 h-full w-64 transform transition-transform duration-300 ease-linear shadow-lg bg-secondary text-text ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`md:hidden fixed top-0 left-0 z-60 h-full w-64 transform transition-transform duration-300 ease-linear shadow-lg bg-secondary text-text ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Sidebar Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
@@ -110,10 +106,9 @@ const Header = () => {
             to="/"
             end
             className={({ isActive }) =>
-              `transition-colors ${
-                isActive
-                  ? 'font-semibold text-primary'
-                  : 'text-muted hover:text-primary'
+              `transition-colors ${isActive
+                ? 'font-semibold text-primary'
+                : 'text-muted hover:text-primary'
               }`
             }
             onClick={() => setSidebarOpen(false)}
@@ -123,10 +118,9 @@ const Header = () => {
           <NavLink
             to="/courses"
             className={({ isActive }) =>
-              `transition-colors ${
-                isActive
-                  ? 'font-semibold text-primary'
-                  : 'text-muted hover:text-primary'
+              `transition-colors ${isActive
+                ? 'font-semibold text-primary'
+                : 'text-muted hover:text-primary'
               }`
             }
             onClick={() => setSidebarOpen(false)}
@@ -136,25 +130,38 @@ const Header = () => {
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
-              `transition-colors ${
-                isActive
-                  ? 'font-semibold text-primary'
-                  : 'text-muted hover:text-primary'
+              `transition-colors ${isActive
+                ? 'font-semibold text-primary'
+                : 'text-muted hover:text-primary'
               }`
             }
             onClick={() => setSidebarOpen(false)}
           >
             Dashboard
           </NavLink>
-          <button
-            onClick={() => {
-              setSidebarOpen(false);
-              navigate('/signin');
-            }}
-            className="px-5 py-2 rounded bg-primary text-white font-semibold hover:bg-accent transition"
-          >
-            Sign In
-          </button>
+          {user ? (
+            <button
+              type="button"
+              className={authButtonStyle}
+              onClick={() => {
+                setSidebarOpen(false);
+                logout();
+              }}
+            >
+              Sign Out
+            </button>
+          ) : (
+            <button
+              type="button"
+              className={authButtonStyle}
+              onClick={() => {
+                setSidebarOpen(false);
+                navigate('/signin');
+              }}
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </div>
     </>

@@ -17,9 +17,11 @@ export const signUp = async (req, res, next) => {
       err.statusCode = 400;
       throw err;
     }
+    // store the email in lowerCase
+    const LowerCaseEmail = email.toLowerCase();
 
     // Email format validation
-    if (!validateEmail(email)) {
+    if (!validateEmail(LowerCaseEmail)) {
       const err = new Error("Invalid email format");
       err.statusCode = 400;
       throw err;
@@ -43,7 +45,7 @@ export const signUp = async (req, res, next) => {
     // Insert user
     const [results] = await connection.query(
       "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      [name, email, hashedPassword]
+      [name, LowerCaseEmail, hashedPassword]
     );
 
     const userId = results.insertId;
@@ -93,11 +95,13 @@ export const signIn = async (req, res, next) => {
     if (!validateEmail(email)) {
       return res.status(400).json({ message: "Invalid email format" });
     }
+    // lowercase the email
+    const lowerCaseEmail = email.toLowerCase();
 
     // check if user exists
     const [existingUser] = await db.query(
       "SELECT * FROM users WHERE email = ?",
-      [email]
+      [lowerCaseEmail]
     );
     if (existingUser.length === 0)
       return res.status(404).json({ message: "User does not exist" });
@@ -112,9 +116,14 @@ export const signIn = async (req, res, next) => {
     const token = jwt.sign({ id: user.user_id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
+    const userData = {
+      userId : user.user_id,
+      email: user.email,
+      name: user.name
+    }
     return res
       .status(200)
-      .json({ success: true, message: "User signed-in", token });
+      .json({ success: true, message: "User signed-in", token, userData });
   } catch (err) {
     next(err);
   }

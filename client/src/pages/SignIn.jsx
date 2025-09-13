@@ -1,13 +1,15 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import api from '../utils/api.js'
 import SignInForm from '../components/SignInForm';
 import { useNavigate } from 'react-router-dom';
+import AuthContext from '../context/AuthContext.jsx';
 
 const SignIn = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: ""
   });
+  const { login } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -38,7 +40,7 @@ const SignIn = () => {
     try {
       const res = await api.post('/auth/sign-in', formData);
       console.log(res);
-      localStorage.setItem('token', res.data.token);
+      login(res.data);
       navigate('/');
     } catch (error) {
       console.log(error);
