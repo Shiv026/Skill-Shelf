@@ -1,7 +1,7 @@
 import { Router } from "express";
 import authorize from "../middlewares/auth.middleware.js";
 import role from "../middlewares/role.middleware.js";
-import upload from "../middlewares/courseThumbnail.middleware.js";
+import upload from "../middlewares/upload.middleware.js";
 
 import {
   createCourse,

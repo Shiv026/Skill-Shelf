@@ -5,48 +5,50 @@ export const createCourse = async (req, res, next) => {
     const { title, description, category_id, price } = req.body;
     const created_by = req.user.user_id;
 
-    if (!title || !description || !category_id || !req.file)
+    if (!title || !description || !category_id || !req.file) {
       return res.status(400).json({ message: "All fields are required including thumbnail" });
+    }
 
-    //check if the course is already created by the creator
+    // check if course already exists
     const [prevCourse] = await db.query(
-      `SELECT course_id from courses where title = ? AND created_by = ?`,
+      "SELECT course_id FROM courses WHERE title = ? AND created_by = ?",
       [title, created_by]
     );
 
-    if (prevCourse.length > 0)
-      return res.status(400).json({ message: "Course already exists" });
+    if (prevCourse.length > 0) {
+      return res.status(409).json({ message: "Course already exists" });
+    }
 
+    // check if category exists
     const [rows] = await db.query(
       "SELECT category_id FROM categories WHERE category_id = ?",
       [category_id]
     );
 
-    if (rows.length === 0)
-      return res.status(409).json({ message: "Category not found" });
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Category not found" });
+    }
 
-    //thumbnail URL 
-    const thumbnailUrl = `/uploads/${req.file.filename}`;
+    // Cloudinary gives you a `secure_url`
+    const thumbnailUrl = req.file.path;
 
+    // handle default price safely
+    const coursePrice = parseFloat(price) || 0.0;
 
-    //handle default course price
-    const coursePrice = price ?? 0.0;
-
+    // insert new course
     const [insertResult] = await db.query(
       "INSERT INTO courses (title, description, thumbnail, price, category_id, created_by) VALUES (?, ?, ?, ?, ?, ?)",
       [title, description, thumbnailUrl, coursePrice, category_id, created_by]
     );
 
-    //for API check only
+    // fetch inserted course details
     const newCourseId = insertResult.insertId;
     const [courseRows] = await db.query(
-      `
-      SELECT c.course_id, c.title, c.description, c.price, 
-      cat.category_name, c.created_by, c.created_at 
-      FROM courses c 
-      JOIN categories cat 
-      ON c.category_id = cat.category_id 
-      WHERE c.course_id = ?`,
+      `SELECT c.course_id, c.title, c.description, c.price, 
+              cat.category_name, c.created_by, c.created_at, c.thumbnail
+       FROM courses c 
+       JOIN categories cat ON c.category_id = cat.category_id 
+       WHERE c.course_id = ?`,
       [newCourseId]
     );
 
@@ -59,6 +61,7 @@ export const createCourse = async (req, res, next) => {
     next(error);
   }
 };
+
 export const viewCourse = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -268,7 +271,7 @@ export const getCourseEnrollments = async (req, res, next) => {
 
     // Check if the course exists or not
     const [results] = await db.query(
-      'SELECT title FROM courses WHERE course_id = ?', 
+      'SELECT title FROM courses WHERE course_id = ?',
       [courseId]
     );
 
@@ -281,7 +284,7 @@ export const getCourseEnrollments = async (req, res, next) => {
        2. Or user should be the creator of the course
     */
     const [courseCreatorRows] = await db.query(
-      'SELECT created_by FROM courses WHERE course_id = ?', 
+      'SELECT created_by FROM courses WHERE course_id = ?',
       [courseId]
     );
 
@@ -289,7 +292,7 @@ export const getCourseEnrollments = async (req, res, next) => {
 
     // Check the roles assigned to the user
     const [roleRows] = await db.query(
-      'SELECT r.role_name FROM roles r JOIN user_roles ur ON ur.role_id = r.role_id WHERE ur.user_id = ?', 
+      'SELECT r.role_name FROM roles r JOIN user_roles ur ON ur.role_id = r.role_id WHERE ur.user_id = ?',
       [userId]
     );
 
@@ -301,7 +304,7 @@ export const getCourseEnrollments = async (req, res, next) => {
     }
     // Get enrolled students
     const [enrollments] = await db.query(
-      'SELECT u.user_id, u.name, u.email FROM enrollments e JOIN users u ON e.user_id = u.user_id WHERE e.course_id = ?', 
+      'SELECT u.user_id, u.name, u.email FROM enrollments e JOIN users u ON e.user_id = u.user_id WHERE e.course_id = ?',
       [courseId]
     );
 
@@ -311,9 +314,9 @@ export const getCourseEnrollments = async (req, res, next) => {
       email: student.email
     }));
 
-    return res.status(200).json({ 
-      message: 'Fetched Enrollments Successfully', 
-      data: formattedEnrollments 
+    return res.status(200).json({
+      message: 'Fetched Enrollments Successfully',
+      data: formattedEnrollments
     });
 
   } catch (error) {
