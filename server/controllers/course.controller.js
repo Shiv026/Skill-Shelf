@@ -29,9 +29,10 @@ export const createCourse = async (req, res, next) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
+    console.log("Uploading file to Cloudinary...");
     // Cloudinary gives you a `secure_url`
     const thumbnailUrl = req.file.path;
-
+    console.log("File uploaded, path:", thumbnailUrl);
     // handle default price safely
     const coursePrice = parseFloat(price) || 0.0;
 
@@ -88,7 +89,7 @@ export const viewCourse = async (req, res, next) => {
 export const viewAllCourse = async (req, res, next) => {
   try {
     const [result] = await db.query(`
-      SELECT c.course_id, c.title, c.description, c.price, c.created_by, c.created_at, cat.category_id, cat.category_name     
+      SELECT c.course_id, c.title, c.description, c.thumbnail, c.price, c.created_by, c.created_at, cat.category_id, cat.category_name     
       FROM courses c JOIN 
       categories cat ON c.category_id = cat.category_id
     `);
@@ -98,7 +99,7 @@ export const viewAllCourse = async (req, res, next) => {
 
     return res
       .status(200)
-      .json({ message: "Course found successfully", data: result });
+      .json({ message: "Course found successfully", result });
   } catch (error) {
     next(error);
   }
