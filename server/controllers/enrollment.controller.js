@@ -53,8 +53,6 @@ export const userEnrollments = async (req, res, next) => {
   try {
     const userId = req.user.user_id;
 
-    
-
     // List all course enrollments for the user
     const [results] = await db.query(
       'SELECT course_id FROM enrollments WHERE user_id = ?',

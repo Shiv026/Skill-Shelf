@@ -3,6 +3,7 @@ import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Courses from './pages/Courses';
+import Lessons from './pages/Lessons';
 import Dashboard from './pages/Dashboard';
 import CreateCourse from './pages/CreateCourse';
 import SignIn from './pages/SignIn';
@@ -20,7 +21,7 @@ function App() {
           <Route element={<ProtectedRoute roles={['instructor']} />}>
             <Route path="/create-course" element={<CreateCourse />} />
           </Route>
-
+          <Route path="/courses/:courseId/lessons" element={<Lessons />} />
           <Route path="/dashboard" element={<Dashboard />} />
 
           <Route path="/signin" element={<SignIn />} />

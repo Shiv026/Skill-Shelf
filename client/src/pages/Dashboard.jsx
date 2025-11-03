@@ -13,15 +13,18 @@ const Dashboard = () => {
 
   if (!user) {
     return (
-      <div className="pt-20 text-center text-muted">
-        Please sign in to view your dashboard.
+      <div className="flex flex-col min-h-screen items-center justify-center">
+        <div className="pt-20 text-center text-muted text-xl">
+          Please sign in to view your dashboard.
+        </div>
         <button
-          className="mt-4 px-6 py-2 bg-primary text-white rounded-lg"
+          className="mt-4 px-6 py-2 bg-primary text-white rounded-lg hover:bg-accent transition duration-300 hover:cursor-pointer"
           onClick={() => navigate("/signin")}
         >
           Sign In
         </button>
       </div>
+
     );
   }
 
@@ -44,8 +47,8 @@ const Dashboard = () => {
             <div className="flex items-center gap-2">
               <button
                 className={`px-4 py-2 rounded-lg font-semibold transition ${view === "student"
-                    ? "bg-primary text-white"
-                    : "bg-secondary text-text border border-border"
+                  ? "bg-primary text-white"
+                  : "bg-secondary text-text border border-border"
                   }`}
                 onClick={() => setView("student")}
               >
@@ -53,8 +56,8 @@ const Dashboard = () => {
               </button>
               <button
                 className={`px-4 py-2 rounded-lg font-semibold transition ${view === "instructor"
-                    ? "bg-primary text-white"
-                    : "bg-secondary text-text border border-border"
+                  ? "bg-primary text-white"
+                  : "bg-secondary text-text border border-border"
                   }`}
                 onClick={() => setView("instructor")}
               >

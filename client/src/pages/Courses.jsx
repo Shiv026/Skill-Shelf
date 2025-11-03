@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../utils/api.js";
 import Loader from "../components/Loader.jsx";
 
 
 const Courses = () => {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -14,11 +16,18 @@ const Courses = () => {
       .finally(() => setLoading(false));
   }, []);
 
+  const handleCourseClick = (courseId) => {
+    navigate(`/courses/${courseId}/lessons`);
+  }
+
+
   if (loading) return <Loader />;
 
   return (
     <div className="pt-20 px-4 max-w-7xl mx-auto mb-5">
-      <h1 className="text-3xl text-center font-bold text-primary mb-8 font-display">All Courses</h1>
+      <h1 className="text-3xl text-center font-bold text-primary mb-8 font-display">
+        All Courses
+      </h1>
 
       {courses.length === 0 ? (
         <div className="text-muted text-center">No Courses Available</div>
@@ -26,7 +35,8 @@ const Courses = () => {
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 
         lg:grid-cols-3 xl:grid-cols-4">
           {courses.map(course => (
-            <div key={course.course_id} className="bg-secondary border border-border rounded-xl shadow p-5 flex flex-col max-w-sm mx-auto">
+            <div key={course.course_id} className="bg-secondary border border-border rounded-xl shadow p-5 flex flex-col max-w-sm mx-auto"
+              onClick={() => handleCourseClick(course.course_id)} >
               <img
                 src={course.thumbnail}
                 alt={course.title}
