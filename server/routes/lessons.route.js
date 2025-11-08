@@ -1,7 +1,7 @@
 import { Router } from "express";
 import upload from "../middlewares/upload.middleware.js";
 import role from "../middlewares/role.middleware.js";
-import { createLessons, getLessonsByCourse } from "../controllers/lesson.controller.js";
+import { createLessons, getLessonsByCourse, getLessonByLessonId } from "../controllers/lesson.controller.js";
 import authorize from "../middlewares/auth.middleware.js";
 
 
@@ -14,5 +14,8 @@ lessonsRouter.post("/", authorize, role(["admin", "instructor"]), upload.array("
 // GET: Fetch all lessons of a course
 //Pass this through the middleware if user has enrolled then only get the lesson
 lessonsRouter.get("/:courseId", getLessonsByCourse);
+
+// GET: Fetch a particular lesson details 
+lessonsRouter.get("/:courseId/:lessonId", getLessonByLessonId);
 
 export default lessonsRouter;

@@ -6,6 +6,7 @@ import Courses from './pages/Courses';
 import Lessons from './pages/Lessons';
 import Dashboard from './pages/Dashboard';
 import CreateCourse from './pages/CreateCourse';
+import CreateLesson from './pages/CreateLesson';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
@@ -18,9 +19,7 @@ function App() {
         <Route path="/" element={<MainLayout />} >
           <Route index element={<Home />} />
           <Route path="/courses" element={<Courses />} />
-          <Route element={<ProtectedRoute roles={['instructor']} />}>
-            <Route path="/create-course" element={<CreateCourse />} />
-          </Route>
+
           <Route path="/courses/:courseId/lessons" element={<Lessons />} />
           <Route path="/dashboard" element={<Dashboard />} />
 
@@ -28,7 +27,10 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="*" element={<NotFound />} />
         </Route>
-
+        <Route element={<ProtectedRoute roles={['instructor']} />}>
+          <Route path="/create-course" element={<CreateCourse />} />
+          <Route path="/create-lesson" element={<CreateLesson />} />
+        </Route>
       </Routes>
       <ToastContainer
         position="top-right"
