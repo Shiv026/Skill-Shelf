@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom'; // To get the course-id from URL
+import api from "../utils/api";
 import LessonInput from './LessonInput';
 
 export default function AddLessonsForm() {
@@ -49,30 +50,39 @@ export default function AddLessonsForm() {
   };
 
   // Handle the final form submission
-  const handleSubmit = async (e) => {
-        e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-        // We must use FormData because we are uploading files
-        const formData = new FormData();
-        formData.append('courseId', courseId);
+  const formData = new FormData();
 
-        // Append each lesson's data
-        lessons.forEach((lesson, index) => {
-        formData.append(`lessons[${index}][title]`, lesson.title);
-        formData.append(`lessons[${index}][description]`, lesson.description);
-        if (lesson.videoFile) {
-            formData.append(`lessons[${index}][video]`, lesson.videoFile);
-        }
-        });
+  lessons.forEach((lesson) => {
+    formData.append("title", lesson.title);
+    formData.append("description", lesson.description);
+    if (lesson.videoFile) {
+      formData.append("videos", lesson.videoFile);
+    }
+  });
 
-        // --- Your Backend Logic ---
-        // Now, send this 'formData' to your backend API
-        console.log('Submitting data for course:', courseId);
-        // Log FormData entries for debugging
-        for (let [key, value] of formData.entries()) {
-        console.log(key, value);
-        }
-    };
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await api.post(
+      `/lessons/${courseId}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ REQUIRED
+        },
+      }
+    );
+
+    console.log("LESSONS CREATED ✅", response.data);
+  } catch (err) {
+    console.error("Upload error ❌", err);
+  }
+};
+
+
 
   return (
     <div className="bg-gray-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">

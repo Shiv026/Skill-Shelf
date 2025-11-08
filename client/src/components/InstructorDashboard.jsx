@@ -83,7 +83,7 @@ const InstructorDashboard = ({ userToken }) => {
                   ₹{course.revenue}
                 </span>
                 <button
-                  onClick={() => navigate(`/create-lesson/${course.course_id}`)}
+                  onClick={() => navigate(`/lessons/${course.course_id}`)}
                   className="bg-white text-teal-700 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 hover:cursor-pointer"
                 >
                   Add <span className="text-muted">More</span> Lessons

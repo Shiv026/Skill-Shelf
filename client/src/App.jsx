@@ -79,7 +79,7 @@ function App() {
         </Route>
         <Route element={<ProtectedRoute roles={['instructor']} />}>
           <Route path="/create-course" element={<CreateCourse />} />
-          <Route path="/create-lesson/:courseId" element={<AddLessonsForm />} />
+          <Route path="/lessons/:courseId" element={<AddLessonsForm />} />
         </Route>
       </Routes>
       <ToastContainer

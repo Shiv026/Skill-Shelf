@@ -37,7 +37,7 @@ const CreateCourse = () => {
      // 3. The frontend READS the response and navigates
       if (data.data && data.data.course_id) {
         // Use the correct path from your JSON: data.data.course_id
-        navigate(`/create-lesson/${data.data.course_id}`);
+        navigate(`/lessons/${data.data.course_id}`);
       } else {
         // This is a fallback in case the API response is not as expected
         console.error("New course ID was not found in API response", data);
