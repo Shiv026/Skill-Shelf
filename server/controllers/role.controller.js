@@ -46,7 +46,10 @@ export const addInstructorRole = async (req, res, next) => {
       return res.status(400).json({ message: "Failed to add instructor role" });
     }
 
-    return res.status(200).json({ message: "Instructor role added successfully" });
+    return res.status(200).json({ 
+      message: "Instructor role added successfully",
+      roles: userRoleNames
+     });
   } catch (error) {
     next(error);
   }

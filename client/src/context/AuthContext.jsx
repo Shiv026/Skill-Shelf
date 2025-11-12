@@ -83,6 +83,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await api.post(
         "/users/role",
+        {},
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
 
@@ -91,6 +92,7 @@ export const AuthProvider = ({ children }) => {
       const updatedUser = { ...user, roles: updatedRoles };
       setUser(updatedUser);
       localStorage.setItem("auth", JSON.stringify(updatedUser));
+      window.location.reload();
     } catch (err) {
       console.error("Failed to become instructor:", err);
     }

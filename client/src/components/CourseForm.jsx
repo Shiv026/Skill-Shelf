@@ -113,7 +113,7 @@ const CourseForm = ({ onSubmit, loading }) => {
             id="thumbnail"
             name="thumbnail"
             accept="image/*"
-            className="hidden"
+            // className="hidden"
             onChange={handleChange}
             required
           />

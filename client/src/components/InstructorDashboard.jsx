@@ -77,11 +77,17 @@ const InstructorDashboard = ({ userToken }) => {
                   Students: {course.total_students}
                 </span>
               </div>
-              <div className="mt-2 flex items-center gap-2">
+              <div className="mt-2 flex items-center justify-between gap-2">
                 <span className="text-muted text-xs">Revenue:</span>
                 <span className="text-primary font-bold text-base">
                   ₹{course.revenue}
                 </span>
+                <button
+                  onClick={() => navigate(`/lessons/${course.course_id}`)}
+                  className="bg-white text-teal-700 font-semibold py-2 px-4 border border-gray-300 rounded-lg shadow-sm transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 hover:cursor-pointer"
+                >
+                  Add <span className="text-muted">More</span> Lessons
+                </button>
               </div>
             </div>
           ))}

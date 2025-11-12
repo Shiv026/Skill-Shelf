@@ -3,15 +3,15 @@ import MainLayout from './layouts/MainLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Courses from './pages/Courses';
-import Lessons from './pages/Lessons';
 import Dashboard from './pages/Dashboard';
-import CreateCourse from './pages/CreateCourse';
-import CreateLesson from './pages/CreateLesson';
+import CreateCourse from './pages/createCourse';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Error from './pages/Error';
 import NotFound from './pages/NotFound';
 import { ToastContainer } from 'react-toastify';
+import AddLessonsForm from './components/AddLessonsForm';
+import QuizForm from './components/QuizForm';
 
 function App() {
   return (
@@ -31,10 +31,9 @@ function App() {
         </Route>
         <Route element={<ProtectedRoute roles={['instructor']} />}>
           <Route path="/create-course" element={<CreateCourse />} />
-          <Route path="/create-lesson" element={<CreateLesson />} />
+          <Route path="/lessons/:courseId" element={<AddLessonsForm />} />
+          <Route path="/quizzes/create-quiz" element={<QuizForm />} />
         </Route>
-        <Route path="/errors" element={<Error />} />
-
       </Routes>
       <ToastContainer
         position="top-right"
@@ -53,3 +52,4 @@ function App() {
 }
 
 export default App
+
