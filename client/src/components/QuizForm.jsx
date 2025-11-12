@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import api from '../utils/api.js'
+import React, { useState, useContext } from 'react';
+import api from '../utils/api.js';
+import { toast } from 'react-toastify';
+import AuthContext from '../context/AuthContext';
 
 // --- SVG Icons for the buttons ---
 
@@ -11,7 +13,7 @@ const TrashIcon = () => (
     viewBox="0 0 24 24"
     strokeWidth={1.5}
     stroke="currentColor"
-    className="w-5 h-5"
+    className="w-5 h-7"
   >
     <path
       strokeLinecap="round"
@@ -44,6 +46,7 @@ const PlusIcon = () => (
 export default function QuizForm() {
   const [quizTitle, setQuizTitle] = useState('');
   
+  const { user } = useContext(AuthContext);
 
   const [questions, setQuestions] = useState([
     {
@@ -127,11 +130,19 @@ export default function QuizForm() {
   console.log("Payload sent to backend:", payload);
 
   try {
-    const res = await api.post("/quizzes/create-quiz", payload);
-    alert(res.data.message || "Quiz created successfully!");
+    const res = await api.post(
+        "/quizzes/create-quiz", 
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          }
+        }
+      );
+    toast.success(res.data.message || "Quiz created successfully!");
   } catch (err) {
     console.error("Error creating quiz:", err);
-    alert("Failed to create quiz");
+    toast.error(err.response?.data?.message || "Failed to create quiz");
   }
 };
 
@@ -178,7 +189,7 @@ export default function QuizForm() {
                   <button
                     type="button"
                     onClick={() => deleteQuestion(question.id)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700 cursor-pointer"
                   >
                     <TrashIcon />
                   </button>
